@@ -1,140 +1,85 @@
 import pygame,random
-pygame.init()
+
+def get_word():
+    f = open('words.txt')
+    l = f.readlines()
+    idx = random.randrange(0,len(l)-1)
+    w = l[idx][:-1]
+    return w
+
+def currentWord(w,guess_word=[]):
+    guessed_letter,spaced_w = guess_word,''
+    for x in range(len(w)):
+        if (w[x] == ' '):
+            spaced_w += ' '
+        elif (w[x] != ' '):
+            spaced_w += '_ '
+            for i in range(len(guessed_letter)):
+                if (w[x].upper() == guessed_letter[i]):
+                    spaced_w = spaced_w[:-2]
+                    spaced_w += w[x].upper()+' '
+    return spaced_w
 
 
-winsize = (900,580)
-colors = [(0,0,0),(100,255,100),(255,255,255),(102,255,255)]
-fonts = [pygame.font.SysFont("ubuntu",20),pygame.font.SysFont("monospace",24),pygame.font.SysFont("ubuntu",45)]
-word = ''
-buttons,guess = [],[]
-hangmanpics = [pygame.image.load('Hangman.png'), pygame.image.load('Hangman(1).png'), pygame.image.load('Hangman(2).png'), pygame.image.load('Hangman(3).png'), pygame.image.load('Hangman(4).png'), pygame.image.load('Hangman(5).png'), pygame.image.load('Hangman(6).png')]
-tries = 0
-
-window = pygame.display.set_mode(winsize)
-pygame.display.set_caption('Hangman Game in Python')
+        
 
 
-def currentWord(word,guess=[]):
-    wordnow = ''
-    for i in range(len(word)):
-        if (word[i] != ' '):
-            wordnow += '_ '
-            for j in range(len(guess)):
-                if (word[i].upper() == guess[j]):
-                    wordnow = wordnow[:-2]
-                    wordnow += word[i].upper() + ' '
-        elif (word[i] == ' '):
-            wordnow += ' '
-    return wordnow
-
-def draw_gamewin():
-    global guess,hangmanpics,tries
+def draw_window():
+    global guess_word,hangmanstages,chances
     window.fill(colors[2])
+
     for i in range(len(buttons)):
         if (buttons[i][4]):
-            pygame.draw.circle(window, colors[0], (buttons[i][1], buttons[i][2]), buttons[i][3])
-            pygame.draw.circle(window, buttons[i][0], (buttons[i][1], buttons[i][2]), buttons[i][3] - 2)
-            text = fonts[0].render(chr(buttons[i][5]), 1, colors[0])
-            window.blit(text, (buttons[i][1] - (text.get_width() / 2), buttons[i][2] - (text.get_height() / 2)))
-        
-    wordshow = currentWord(word,guess)
-    text = fonts[2].render(wordshow,1,colors[0])
-    rect = text.get_rect()
-    level = hangmanpics[tries]
-    window.blit(text,(winsize[0]/2  - level.get_width()/2 + 20, 150))
-    pygame.display.update()
-
-def inpword():
-    f = open("words.txt")
-    l = f.readlines()
-    i = random.randrange(0,len(l)-1)
-    return l[i][:-1]
-
-def hanging(guess):
-    global word
-    if (guess.lower() in word.lower()):
-        return False
-    else:
-        return True
-
-def getbutton(x,y):
-    for i in range(len(buttons)):
-        if ((y-20 < buttons[i][2]) and (y+20 > buttons[i][2])):
-            if ((x-20 < buttons[i][1]) and (x+20 > buttons[i][1])):
-                return buttons[i][5]
-    return None
-
-def game_reset():
-    global guess,buttons,word,tries
-    for i in range(len(buttons)):
-        buttons[i][4] = True
-    tries,guess = 0,[]
-    word = inpword()
-    
-
-def end(winner):
-    global tries
-    draw_gamewin()
-    pygame.time.delay(1000)
-    window.fill(colors[1])
-
-    if (not winner):
-        text = fonts[2].render('You Lost, Press any key to play again....',1,colors[0])
-        print('The correct word is: ',word.upper())
-    else:
-        text = fonts[2].render('WINNER!! Press any key to play again....',1,colors[0])
-    actual_word = fonts[2].render(word.upper(),1,colors[0])
-    disp_word = fonts[2].render('The word was: ',1,colors[0])
-
-    window.blit(actual_word,(winsize[0]/2 - actual_word.get_width()/2, 295))
-    window.blit(disp_word, (winsize[0]/2 - disp_word.get_width()/2, 245))
-    window.blit(text, (winsize[0]/2 - text.get_width()/2, 140))
-    pygame.display.update()
-
-    play_again = True
-    while (play_again):
-        for event in pygame.event.get():
-            if (event.type() == pygame.QUIT):
-                pygame.quit()
-            elif (event.type() == pygame.KEYDOWN):
-                play_again = False
-    game_reset()
+            pygame.draw.circle(window,colors[0],(buttons[i][1],buttons[i][2]),buttons[i][3])
+            pygame.draw.circle(window,buttons[i][0],(buttons[i][1],buttons[i][2]),buttons[i][3]-2)
+            text = fonts[0].render(chr(buttons[i][5]),1,colors[0])
+            window.blit(text,(buttons[i][1]-(text.get_width()/2),buttons[i][2]-(text.get_height()/2)))
+            spaced_w = currentWord(word,guess_word)
+            text1 = fonts[1].render(spaced_w,1,colors[0])
+            r = text1.get_rect()
+            l = r[2]
+            window.blit(text1,(win_size[1]/2-l/2,400))
+            curr_stage = hangmanstages[chances]
+            window.blit(curr_stage,(win_size[1]/2 - curr_stage.get_width()/2+20,150))
+            pygame.display.update()
 
 
-inc,val = round(winsize[0]/13),0
+win_size = [580,900]
+colors = [(0,0,0),(100,255,100),(255,255,255),(102,255,255)]
+
+pygame.init()
+window = pygame.display.set_mode((win_size[1],win_size[0]))
+pygame.display.set_caption('Hangman Game in Python')
+fonts = [pygame.font.SysFont("ubuntu",20),pygame.font.SysFont("monospace",24),pygame.font.SysFont("ubuntu",45)]
+hangmanstages = [pygame.image.load('Hangman.png'), pygame.image.load('Hangman(1).png'), pygame.image.load('Hangman(2).png'), pygame.image.load('Hangman(3).png'), pygame.image.load('Hangman(4).png'), pygame.image.load('Hangman(5).png'), pygame.image.load('Hangman(6).png')]
+buttons,guess_word,word = [],[],''
+chances = 0
+
+increase = round(win_size[1] / 13)
+x = 25
 for i in range(26):
     if (i >= 13):
         y = 85
-        val = inc * (i-13)
+        x += (increase * (i - 13))
     else:
         y = 40
-        val = inc * i
-    x = 25+val
-    buttons.append([colors[3],x,y,20,True,65+i])
+        x += (increase * i)
 
-word = inpword()
-play_game  = True
-while (play_game):
-    draw_gamewin()
+word = get_word()
+
+    spaced_w = ''play_on = True
+
+while (play_on):
+    draw_window()
     pygame.time.delay(10)
+
     for event in pygame.event.get():
+        if (event.type == pygame.KEYDOWN):
+            if (even.key == pygame.K_ESCAPE):
+                play_on = False
         if (event.type == pygame.QUIT):
-            play_game = False
-        elif (event.type == pygame.KEYDOWN):
-            if (event.key == pygame.ESCAPE):
-                play_game = False
-        elif (event.type == pygame.MOUSEBUTTONDOWN):
-            coord = pygame.mouse.get_pos()
-            key = getbutton(coord[0],coord[1])
-            if (key != None):
-                guess.append(chr(key))
-                buttons[key-65][4] = False
-                if (hanging(chr(key))):
-                    if (tries >= 6):
-                        end(False)
-                    else:
-                        tries += 1
-                else:
-                    if (currentWord(word,guess).count('_') == 0):
-                        end(True)
+            play_on = False
+        if (event.type == pygame.MOUSEBUTTONDOWN):
+        
+
 pygame.quit()
