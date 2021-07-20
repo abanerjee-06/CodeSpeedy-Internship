@@ -1,5 +1,13 @@
 import pygame,random
 
+
+def ishang(word_guess):
+    global word
+    flag = False
+    if (word_guess.lower() not in word.lower()):
+        flag = True
+    return flag
+
 def get_word():
     f = open('words.txt')
     l = f.readlines()
@@ -17,12 +25,49 @@ def currentWord(w,guess_word=[]):
             for i in range(len(guessed_letter)):
                 if (w[x].upper() == guessed_letter[i]):
                     spaced_w = spaced_w[:-2]
-                    spaced_w += w[x].upper()+' '
+                    spaced_w += w[x].upper() + ' '
     return spaced_w
 
+def buttonClick(x,y):
+    for i in range(len(buttons)):
+        if (x > buttons[i][1]-20 and x < buttons[i][1]+20):
+            if (y > buttons[i][2]-20 and y < buttons[i][2]+20):
+                return buttons[i][5]
+    return None
 
-        
+def game_reset():
+    global chances, guess_word, word
+    chances,guess_word,word = 0,[],get_word()
+    for i in range(len(buttons)):
+        buttons[i][4] = True
 
+def game_over(winner):
+    prompts = ['You Lost, press any key to play again...','WINNER!, press any key to play again...']
+    draw_window()
+    pygame.time.delay(1000)
+    window.fill(colors[1])
+
+    if (not winner):
+        text = fonts[2].render(prompts[0], 1, colors[0])
+    else:
+        text = fonts[2].render(prompts[0], 1, colors[0])
+    
+    word_guessed = fonts[2].render(word.upper(), 1, colors[0])
+    word_actual = fonts[2].render('The phrase was: ', 1, colors[0])
+
+    window.blit(word_guessed, (win_size[1]/2 - word_guessed.get_width()/2, 295))
+    window.blit(word_actual, (win_size[1]/2 - word_actual.get_width()/2, 245))
+    window.blit(text, (win_size[1]/2 - text.get_width()/2, 140))
+    
+    pygame.display.update()
+    retry = True
+    while(retry):
+        for event in pygame.event.get():
+            if (event.type == pygame.KEYDOWN):
+                retry = False
+            if (event.type == pygame.QUIT):
+                pygame.quit()
+    game_reset()
 
 def draw_window():
     global guess_word,hangmanstages,chances
@@ -30,24 +75,24 @@ def draw_window():
 
     for i in range(len(buttons)):
         if (buttons[i][4]):
-            pygame.draw.circle(window,colors[0],(buttons[i][1],buttons[i][2]),buttons[i][3])
-            pygame.draw.circle(window,buttons[i][0],(buttons[i][1],buttons[i][2]),buttons[i][3]-2)
-            text = fonts[0].render(chr(buttons[i][5]),1,colors[0])
-            window.blit(text,(buttons[i][1]-(text.get_width()/2),buttons[i][2]-(text.get_height()/2)))
-            spaced_w = currentWord(word,guess_word)
-            text1 = fonts[1].render(spaced_w,1,colors[0])
-            r = text1.get_rect()
-            l = r[2]
-            window.blit(text1,(win_size[1]/2-l/2,400))
-            curr_stage = hangmanstages[chances]
-            window.blit(curr_stage,(win_size[1]/2 - curr_stage.get_width()/2+20,150))
-            pygame.display.update()
+            pygame.draw.circle(window, colors[0], (buttons[i][1],buttons[i][2]), buttons[i][3])
+            pygame.draw.circle(window, buttons[i][0], (buttons[i][1],buttons[i][2]), buttons[i][3]-2)
+            text = fonts[0].render(chr(buttons[i][5]), 1, colors[0])
+            window.blit(text, (buttons[i][1] - (text.get_width()/2), buttons[i][2] - (text.get_height()/2)))
+        
+        spaced_w = currentWord(word,guess_word)
+        text1 = fonts[1].render(spaced_w, 1, colors[0])
+        r = text1.get_rect()
+        l = r[2]
+        window.blit(text1,(win_size[1]/2 - l/2, 400))
+        curr_stage = hangmanstages[chances]
+        window.blit(curr_stage,(win_size[1]/2 - curr_stage.get_width()/2 + 20,150))
+        pygame.display.update()
 
-
-win_size = [580,900]
-colors = [(0,0,0),(100,255,100),(255,255,255),(102,255,255)]
 
 pygame.init()
+win_size = [580,900]
+colors = [(0,0,0),(100,255,100),(255,255,255),(102,255,255)]
 window = pygame.display.set_mode((win_size[1],win_size[0]))
 pygame.display.set_caption('Hangman Game in Python')
 fonts = [pygame.font.SysFont("ubuntu",20),pygame.font.SysFont("monospace",24),pygame.font.SysFont("ubuntu",45)]
@@ -56,18 +101,18 @@ buttons,guess_word,word = [],[],''
 chances = 0
 
 increase = round(win_size[1] / 13)
-x = 25
+x,y = 25,60
 for i in range(26):
     if (i >= 13):
-        y = 85
+        y += 25
         x += (increase * (i - 13))
     else:
-        y = 40
+        y -= 20
         x += (increase * i)
+    buttons.append([colors[3],x,y,20,True,65+i])
 
 word = get_word()
-
-    spaced_w = ''play_on = True
+play_on = True
 
 while (play_on):
     draw_window()
@@ -80,6 +125,18 @@ while (play_on):
         if (event.type == pygame.QUIT):
             play_on = False
         if (event.type == pygame.MOUSEBUTTONDOWN):
-        
+            coord = pygame.mouse.get_pos()
+            alphabet = buttonClick(coord[0],coord[1])
+            if (alphabet is not None):
+                guess_word.append(chr(alphabet))
+                buttons[alphabet - 65][4] = False
+                if (ishang(chr(alphabet)) == False):
+                    if (currentWord(word, guess_word).count('_') == 0):
+                        game_over(True)
+                else:
+                    if (chances == 6):
+                        game_over(False)
+                    else:
+                        chances += 1        
 
 pygame.quit()
