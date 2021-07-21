@@ -1,0 +1,22 @@
+Title: Hangman Game in Python
+Project Short Description: A simple hangman game made in Python using "pygame" module. The game is made in two version for big and small game windows.
+Write all about packet: 
+
+https://coderspacket.com/uploads/user_files/2021-07/Hangman_Python-1626860268-675.png
+
+
+Hangman is a word(s) guessing game that gives a specific number of chances to guess the word (until the image of a man hanging is completed). In this game, it is a total of six chances (modifiable). The letters appear in the form of circles, which can be clicked. If the letter is there in the word/phrase, then all the occurrences of the word will be shown in the corresponding positions (that were earlier blanks) and that letter will be removed from the list. If the letter is not present, the image of the hanging man will move a step towards completion. Once the complete image is formed, it is game over i.e., the player has lost. If the player can guess the word/phrase before that, then he/she wins the game.
+
+To restart the game (after a win/loss), the player has to "press any key" to restart the game. If the player wants to quit anytime in the middle of the game, they have to press the "Esc" button to quit the game or just close the game window (the "x" sign). Following is how to play the game after downloading (for a Linux terminal):
+
+1) Unzip the folder.
+
+2) Install "pygame" into your system
+
+3) Go into the HANGMAN folder
+
+4) Execute the hangman_small.py file to play the game in a small window, or execute the hangman_big.py to play the game in a bigger window
+
+5) Inside the "Photos" folder, there are two separate folders for the images (the images in the game) for small and big screen versions called: Big_Scr and small_scr
+
+6) "words.txt" contains words/phrases from which one is randomly picked for one turn of the game
