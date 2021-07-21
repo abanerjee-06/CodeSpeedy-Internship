@@ -50,7 +50,7 @@ def game_over(winner):
     if (not winner):
         text = fonts[2].render(prompts[0], 1, colors[0])
     else:
-        text = fonts[2].render(prompts[0], 1, colors[0])
+        text = fonts[2].render(prompts[1], 1, colors[0])
     
     word_guessed = fonts[2].render(word.upper(), 1, colors[0])
     word_actual = fonts[2].render('The phrase was: ', 1, colors[0])
@@ -71,7 +71,7 @@ def game_over(winner):
 
 def draw_window():
     global guess_word,hangmanstages,chances
-    window.fill(colors[2])
+    window.fill(colors[1])
 
     for i in range(len(buttons)):
         if (buttons[i][4]):
@@ -80,36 +80,39 @@ def draw_window():
             text = fonts[0].render(chr(buttons[i][5]), 1, colors[0])
             window.blit(text, (buttons[i][1] - (text.get_width()/2), buttons[i][2] - (text.get_height()/2)))
         
-        spaced_w = currentWord(word,guess_word)
-        text1 = fonts[1].render(spaced_w, 1, colors[0])
-        r = text1.get_rect()
-        l = r[2]
-        window.blit(text1,(win_size[1]/2 - l/2, 400))
-        curr_stage = hangmanstages[chances]
-        window.blit(curr_stage,(win_size[1]/2 - curr_stage.get_width()/2 + 20,150))
-        pygame.display.update()
+    spaced_w = currentWord(word,guess_word)
+    text1 = fonts[1].render(spaced_w, 1, colors[0])
+    r = text1.get_rect()
+    l = r[2]
+
+    window.blit(text1,(win_size[1]/2 - l/2, 800))
+    
+    curr_stage = hangmanstages[chances]
+    window.blit(curr_stage,(win_size[1]/2 - curr_stage.get_width()/2 + 20,150))
+    pygame.display.update()
 
 
 pygame.init()
-win_size = [580,900]
-colors = [(0,0,0),(100,255,100),(255,255,255),(102,255,255)]
+win_size = [1160,1800]
+colors = [(0,0,0),(100,255,100),(255,255,0),(102,255,255)]
 window = pygame.display.set_mode((win_size[1],win_size[0]))
-pygame.display.set_caption('Hangman Game in Python')
-fonts = [pygame.font.SysFont("ubuntu",20),pygame.font.SysFont("monospace",24),pygame.font.SysFont("ubuntu",45)]
-hangmanstages = [pygame.image.load('Hangman.png'), pygame.image.load('Hangman(1).png'), pygame.image.load('Hangman(2).png'), pygame.image.load('Hangman(3).png'), pygame.image.load('Hangman(4).png'), pygame.image.load('Hangman(5).png'), pygame.image.load('Hangman(6).png')]
+pygame.display.set_caption('Hangman Game in Python [Big Screen]')
+fonts = [pygame.font.SysFont("ubuntu",20),pygame.font.SysFont("monospace",34),pygame.font.SysFont("ubuntu",45)]
+hangmanstages = [pygame.image.load('./Photos/Big_scr/stage_0.png'), pygame.image.load('./Photos/Big_scr/stage_1.png'), pygame.image.load('./Photos/Big_scr/stage_2.png'),\
+pygame.image.load('./Photos/Big_scr/stage_3.png'), pygame.image.load('./Photos/Big_scr/stage_4.png'), pygame.image.load('./Photos/Big_scr/stage_5.png'), pygame.image.load('./Photos/Big_scr/stage_6.png')]
 buttons,guess_word,word = [],[],''
 chances = 0
 
 increase = round(win_size[1] / 13)
-x,y = 25,60
+init_vals = [25,60]
 for i in range(26):
     if (i >= 13):
-        y += 25
-        x += (increase * (i - 13))
+        y = init_vals[1] + 25
+        x = init_vals[0] + (increase * (i - 13))
     else:
-        y -= 20
-        x += (increase * i)
-    buttons.append([colors[3],x,y,20,True,65+i])
+        y = init_vals[1] - 20
+        x = init_vals[0] + (increase * i)
+    buttons.append([colors[2],x,y,20,True,65+i])
 
 word = get_word()
 play_on = True
@@ -120,7 +123,7 @@ while (play_on):
 
     for event in pygame.event.get():
         if (event.type == pygame.KEYDOWN):
-            if (even.key == pygame.K_ESCAPE):
+            if (event.key == pygame.K_ESCAPE):
                 play_on = False
         if (event.type == pygame.QUIT):
             play_on = False
@@ -134,9 +137,10 @@ while (play_on):
                     if (currentWord(word, guess_word).count('_') == 0):
                         game_over(True)
                 else:
+                    if (chances < 6):
+                        chances += 1 
                     if (chances == 6):
                         game_over(False)
-                    else:
-                        chances += 1        
+                    
 
 pygame.quit()
