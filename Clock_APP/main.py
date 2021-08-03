@@ -36,7 +36,7 @@ class CLOCKApp(App):
 LabelBase.register(
     name='Digital',
     fn_regular= 'Let_s_go_Digital_Regular.ttf',
-    fn_bold= 'Let_s_go_Digital_Bold.ttf'
+    fn_bold= 'Let_s_go_Digital_Regular.ttf'
 )
 Window.clearcolor = get_color_from_hex('#39107D')
 CLOCKApp().run()
