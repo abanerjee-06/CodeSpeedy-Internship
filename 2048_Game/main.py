@@ -4,7 +4,7 @@ from tkinter import Frame, Label, CENTER
 import random
 
 
-grid_coord = (400,4,10)
+grid_coord = (500,4,10)
 bg_grid,bg_empty_cell = "#92877d","#9e948a"
 bg_cell = {2: "#eee4da", 4: "#ede0c8", 8: "#f2b179",
             16: "#f59563", 32: "#f67c5f", 64: "#f65e3b",
@@ -24,23 +24,22 @@ ctrls2 = ["'j'","'h'","'k'","'l'"]
 class GameDisplay(Frame):
     def __init__(self):
         Frame.__init__(self)
+
         self.grid()
         self.master.title('2048 Game in Python')
         self.master.bind("<Key>", self.key_down)
-        self.master.bind("<Up>", func.move(self.M,"up"))
-        self.master.bind("<Left>", func.move(self.M,"left"))
-        self.master.bind("<Down>", func.move(self.M,"down"))
-        self.master.bind("<Right>", func.move(self.M,"right"))
 
         self.cells,self.old_mat = [],[]
         self.begin_game()
         self.M = func.reset(grid_coord[1])
         self.update_game()
         
-        self.commands = {ctrls1[0]:func.move(self.M,"up"),ctrls1[1]:func.move(self.M,"left"),
-                        ctrls1[2]:func.move(self.M,"down"),ctrls1[3]:func.move(self.M,"right"),
-                        ctrls2[0]:func.move(self.M,"up"),ctrls2[1]:func.move(self.M,"left"),
-                        ctrls2[2]:func.move(self.M,"down"),ctrls2[3]:func.move(self.M,"right")}
+        self.commands = {ctrls1[0]:func.move_up,ctrls1[1]:func.move_left,
+                        ctrls1[2]:func.move_down,ctrls1[3]:func.move_right,
+                        ctrls2[0]:func.move_up,ctrls2[1]:func.move_left,
+                        ctrls2[2]:func.move_down,ctrls2[3]:func.move_right}
+
+        self.mainloop()
     
     def begin_game(self):
         bg = Frame(self,bg=bg_grid,height=grid_coord[0],width=grid_coord[0])
@@ -56,6 +55,10 @@ class GameDisplay(Frame):
                 ele_text.grid()
                 r.append(ele_text)
             self.cells.append(r)
+        
+        print('Controls:')
+        print("W or J: MOVE UP \t\t  A or H: MOVE LEFT")
+        print("S or K: MOVE DOWN\t\t  D or L: MOVE RIGHT")
 
     def update_game(self):
         for i in range(grid_coord[1]):
@@ -69,9 +72,9 @@ class GameDisplay(Frame):
     def key_down(self,event):
         char_key = repr(event.char)
         if (char_key in self.commands):
-            self.M,flag = self.commands[char_key]
+            self.M,flag = self.commands[char_key](self.M)
             if (flag):
-                self.M = func.inst_two(self.M,len(self.M))
+                self.M = func.inst_two(self.M)
                 self.old_mat.append(self.M)
                 self.update_game()
                 if (func.state(self.M) == 0):
@@ -87,3 +90,9 @@ class GameDisplay(Frame):
     
 
 game = GameDisplay()
+lar,hi = 0,0
+for i in range(len(game.M)):
+    hi = max(game.M[i])
+    if (lar < hi):
+        lar = hi
+print('You Score is: ',lar)
